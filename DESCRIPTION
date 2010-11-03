@@ -1,7 +1,7 @@
 Package: pheatmap
 Type: Package
 Title: Pretty Heatmaps
-Version: 0.7.3
+Version: 0.7.4
 Date: 2010-11-3
 Author: Raivo Kolde
 Maintainer: Raivo Kolde <rkolde@gmail.com>
@@ -17,6 +17,6 @@ Imports: grid
 License: GPL-2
 LazyLoad: yes
 Collate: 'pheatmap-package.r' 'pheatmap.r'
-Packaged: 2012-09-14 11:09:30 UTC; Kolde
+Packaged: 2012-11-22 12:07:17 UTC; Kolde
 Repository: CRAN
-Date/Publication: 2012-09-14 12:07:21
+Date/Publication: 2012-11-22 18:35:06
