@@ -7,14 +7,16 @@ Pretty heatmaps
 A function to draw clustered heatmaps. 
 }
 \usage{
-pheatmap(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090",
-	 "#FFFFBF", "#E0F3F8", "#91BFDB", "#4575B4")))(100), breaks = NA, 
-	cellwidth = NA, cellheight = NA, scale = "none", cluster_rows = TRUE,
-	 cluster_cols = TRUE, clustering_distance = "correlation",
-	 clustering_method = "complete", treeheight_row = ifelse(cluster_rows, 50, 0),
-	 treeheight_col = ifelse(cluster_cols, 50, 0), legend = TRUE, annotation = NA,
-	 annotation_colors = NA, annotation_legend = TRUE, filename = NA, width = NA, 
-	height = NA, ...)
+pheatmap(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", 
+	    "#FEE090", "#FFFFBF", "#E0F3F8", "#91BFDB", "#4575B4")))(100), 
+	    breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, 
+	    scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, 
+	    clustering_distance = "euclidean", clustering_method = "complete", 
+	    treeheight_row = ifelse(cluster_rows, 50, 0), 
+	    treeheight_col = ifelse(cluster_cols, 50, 0), legend = TRUE, 
+	    annotation = NA, annotation_colors = NA, annotation_legend = TRUE,
+	    show_rownames = T, show_colnames = T, filename = NA, width = NA, 
+	    height = NA, ...)
 }
 
 \arguments{
@@ -27,12 +29,21 @@ vector of colors used in heatmap.
   \item{breaks}{
 a sequence of numbers that covers the range of values in mat and is one element longer than color vector. Used for mapping values to colors. Useful, if needed to map certain values to certain colors, to certain values. If value is NA then the breaks are calculated automatically.
 }
-  \item{cellwidth, cellheight}{
-Individual cell measurements in points. If left as NA, then the values depend on the size of plotting window.
+
+\item{border_color}{
+color of cell borders on heatmap, use NA if no border should be drawn.
+}
+
+\item{cellwidth, cellheight}{
+individual cell measurements in points. If left as NA, then the values depend on the size of plotting window.
 }
 
 \item{scale}{
 character indicating if the values should be centered and scaled in either the row direction or the column direction, or none. Corresponding values are \code{"row"}, \code{"column"} and \code{"none"}
+}
+
+\item{cluster_rows, cluster_cols}{
+boolean values determining if either rows or columns should be clustered.
 }
 
 \item{clustering_distance}{
@@ -43,10 +54,6 @@ distance measure used in clustering. Possible values are \code{"correlation"} an
 clustering method used. Accepts the same values as \code{\link{hclust}}.
 }
 
-
-  \item{cluster_rows, cluster_cols}{
-boolean values determining if either rows or columns should be clustered.
-}
 
   \item{treeheight_row, treeheight_col}{
 the height of a tree, if data is clustered, default value 50 points.
@@ -68,7 +75,12 @@ list for specifying annotation track colors manually. It is possible to define t
 boolean value showing if the legend for annotation tracks should be drawn. 
 }
 
-  \item{filename}{
+
+\item{show_rownames, show_colnames}{
+booleans specifying if row and column names are be shown.
+}
+
+\item{filename}{
 file path ending with .pdf where to save the picture. Even if the plot does not fit into the plotting window, the file size is calculated so that the plot would fit there, unless specified otherwise.
 }
   \item{width, height}{
