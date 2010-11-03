@@ -1,11 +1,11 @@
 Package: pheatmap
-Type: Package
-Title: Pretty Heatmaps
-Version: 0.5.1
-Date: 2010-11-3
-Author: Raivo Kolde
+Imports: grid
 Maintainer: Raivo Kolde <rkolde@gmail.com>
-Depends: R (>= 2.0)
+License: GPL-2
+Title: Pretty Heatmaps
+Type: Package
+LazyLoad: yes
+Author: Raivo Kolde
 Description: The package for drawing pretty heatmaps in R. The ordinary
         heatmap function in R has several drawbacks, when it comes to
         producing publication quality heatmaps. It is hard to produce
@@ -13,10 +13,10 @@ Description: The package for drawing pretty heatmaps in R. The ordinary
         shapes. The function pheatmap tries to alleviate the problems
         by offering more fine grained control over heatmap dimensions
         and appearance.
-Imports: grid
-License: GPL-2
-LazyLoad: yes
+Version: 0.6.0
+Date: 2010-11-3
+Depends: R (>= 2.0)
 Collate: 'pheatmap.r'
-Packaged: 2011-07-03 20:52:05 UTC; Kolde
+Packaged: 2011-12-06 16:52:10 UTC; Kolde
 Repository: CRAN
-Date/Publication: 2011-07-04 08:23:25
+Date/Publication: 2012-02-18 07:05:09

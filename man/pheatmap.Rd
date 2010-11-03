@@ -2,20 +2,28 @@
 \alias{pheatmap}
 \title{A function to draw clustered heatmaps.}
 \usage{pheatmap(mat, color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
-    "#E0F3F8", "#91BFDB", "#4575B4")))(100), breaks=NA, border_color="grey60",
-    cellwidth=NA, cellheight=NA, scale="none", cluster_rows=TRUE, cluster_cols=TRUE,
-    clustering_distance_rows="euclidean", clustering_distance_cols="euclidean",
-    clustering_method="complete", treeheight_row=ifelse(cluster_rows, 50, 0),
+    "#E0F3F8", "#91BFDB", "#4575B4")))(100), kmeans_k=NA, breaks=NA,
+    border_color="grey60", cellwidth=NA, cellheight=NA, scale="none",
+    cluster_rows=TRUE, cluster_cols=TRUE,
+    clustering_distance_rows="euclidean",
+    clustering_distance_cols="euclidean", clustering_method="complete",
+    treeheight_row=ifelse(cluster_rows, 50, 0),
     treeheight_col=ifelse(cluster_cols, 50, 0), legend=TRUE, annotation=NA,
-    annotation_colors=NA, annotation_legend=TRUE, show_rownames=T, show_colnames=T,
-    fontsize=10, fontsize_row=fontsize, fontsize_col=fontsize, filename=NA, width=NA,
-    height=NA, ...)
+    annotation_colors=NA, annotation_legend=TRUE, show_rownames=T,
+    show_colnames=T, main=NA, fontsize=10, fontsize_row=fontsize,
+    fontsize_col=fontsize, filename=NA, width=NA, height=NA, ...)
 }
 \description{A function to draw clustered heatmaps.}
-\details{Detailed description of function}
+\details{The function also allows to aggregate the rows using kmeans clustering. This is 
+advisable if number of rows is so big that R cannot handle their hierarchical 
+clustering anymore, roughly more than 1000. Instead of showing all the rows 
+separately one can cluster the rows in advance and show only the cluster centers. 
+The number of clusters can be tuned with parameter kmeans_k.}
 \author{Raivo Kolde <rkolde@gmail.com>}
 \arguments{\item{mat}{numeric matrix of the values to be plotted.}
 \item{color}{vector of colors used in heatmap.}
+\item{kmeans_k}{the number of kmeans clusters to make, if we want to agggregate the 
+rows before drawing heatmap. If NA then the rows are not aggregated.}
 \item{breaks}{a sequence of numbers that covers the range of values in mat and is one 
 element longer than color vector. Used for mapping values to colors. Useful, if needed 
 to map certain values to certain colors, to certain values. If value is NA then the 
@@ -55,6 +63,7 @@ details.}
 should be drawn.}
 \item{show_rownames}{boolean specifying if column names are be shown.}
 \item{show_colnames}{boolean specifying if column names are be shown.}
+\item{main}{the title of the plot}
 \item{fontsize}{base fontsize for the plot}
 \item{fontsize_row}{fontsize for rownames (Default: fontsize)}
 \item{fontsize_col}{fontsize for colnames (Default: fontsize)}
@@ -76,11 +85,12 @@ rownames(test) = paste("Gene", 1:20, sep = "")
 
 # Draw heatmaps
 pheatmap(test)
+pheatmap(test, kmeans_k = 2)
 pheatmap(test, scale = "row", clustering_distance_rows = "correlation")
 pheatmap(test, color = colorRampPalette(c("navy", "white", "firebrick3"))(50))
 pheatmap(test, cluster_row = FALSE)
 pheatmap(test, legend = FALSE)
-pheatmap(test, cellwidth = 15, cellheight = 12)
+pheatmap(test, cellwidth = 15, cellheight = 12, main = "Example heatmap")
 pheatmap(test, cellwidth = 15, cellheight = 12, fontsize = 8, filename = "test.pdf")
 
 
@@ -99,7 +109,7 @@ Var2 = c("lightgreen", "navy")
 
 ann_colors = list(Var1 = Var1, Var2 = Var2)
 
-pheatmap(test, annotation = annotation, annotation_colors = ann_colors)
+pheatmap(test, annotation = annotation, annotation_colors = ann_colors, main = "Example with all the features")
 
 # Specifying clustering from distance matrix
 drows = dist(test, method = "minkowski")
