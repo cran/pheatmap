@@ -231,6 +231,39 @@ heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, 
 	# Set layout
 	mindim = lo(coln = colnames(matrix), rown = rownames(matrix), nrow = nrow(matrix), ncol = ncol(matrix), cellwidth = cellwidth, cellheight = cellheight, treeheight_col = treeheight_col, treeheight_row = treeheight_row, legend = legend, annotation = annotation, annotation_colors = annotation_colors, annotation_legend = annotation_legend, main = main, fontsize = fontsize, fontsize_row = fontsize_row, fontsize_col = fontsize_col,  ...)
 	
+	if(!is.na(filename)){
+		pushViewport(vplayout(1:5, 1:5))
+		
+		if(is.na(height)){
+			height = convertHeight(unit(0:1, "npc"), "inches", valueOnly = T)[2]
+		}
+		if(is.na(width)){
+			width = convertWidth(unit(0:1, "npc"), "inches", valueOnly = T)[2]
+		}
+		
+		# Get file type
+		r = regexpr("\\.[a-zA-Z]*$", filename)
+		if(r == -1) stop("Improper filename")
+		ending = substr(filename, r + 1, r + attr(r, "match.length"))
+
+		f = switch(ending,
+			pdf = function(x, ...) pdf(x, ...),
+			png = function(x, ...) png(x, units = "in", res = 300, ...),
+			jpeg = function(x, ...) jpeg(x, units = "in", res = 300, ...),
+			jpg = function(x, ...) jpeg(x, units = "in", res = 300, ...),
+			tiff = function(x, ...) tiff(x, units = "in", res = 300, compression = "lzw", ...),
+			bmp = function(x, ...) bmp(x, units = "in", res = 300, ...),
+			stop("File type should be: pdf, png, bmp, jpg, tiff")
+		)
+		
+		# print(sprintf("height:%f width:%f", height, width))
+		f(filename, height = height, width = width)
+		heatmap_motor(matrix, cellwidth = cellwidth, cellheight = cellheight, border_color = border_color, tree_col = tree_col, tree_row = tree_row, treeheight_col = treeheight_col, treeheight_row = treeheight_row, breaks = breaks, color = color, legend = legend, annotation = annotation, annotation_colors = annotation_colors, annotation_legend = annotation_legend, filename = NA, main = main, fontsize = fontsize, fontsize_row = fontsize_row, fontsize_col = fontsize_col, ...)
+		dev.off()
+		upViewport()
+		return()
+	}
+	
 	# Omit border color if cell size is too small 
 	if(mindim < 3) border_color = NA
 	
@@ -298,36 +331,7 @@ heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, 
 		upViewport()
 	}
 	
-	pushViewport(vplayout(1:5, 1:5))
 	
-	if(!is.na(filename)){
-		if(is.na(height)){
-			height = convertHeight(unit(0:1, "npc"), "inches", valueOnly = T)[2]
-		}
-		if(is.na(width)){
-			width = convertWidth(unit(0:1, "npc"), "inches", valueOnly = T)[2]
-		}
-		
-		# Get file type
-		r = regexpr("\\.[a-zA-Z]*$", filename)
-		if(r == -1) stop("Improper filename")
-		ending = substr(filename, r + 1, r + attr(r, "match.length"))
-
-		f = switch(ending,
-			pdf = function(x, ...) pdf(x, ...),
-			png = function(x, ...) png(x, units = "in", res = 300, ...),
-			jpeg = function(x, ...) jpeg(x, units = "in", res = 300, ...),
-			jpg = function(x, ...) jpeg(x, units = "in", res = 300, ...),
-			tiff = function(x, ...) tiff(x, units = "in", res = 300, compression = "lzw", ...),
-			bmp = function(x, ...) bmp(x, units = "in", res = 300, ...),
-			stop("File type should be: pdf, png, bmp, jpg, tiff")
-		)
-		
-		# print(sprintf("height:%f width:%f", height, width))
-		f(filename, height = height, width = width)
-		heatmap_motor(matrix, cellwidth = cellwidth, cellheight = cellheight, border_color = border_color, tree_col = tree_col, tree_row = tree_row, treeheight_col = treeheight_col, treeheight_row = treeheight_row, breaks = breaks, color = color, legend = legend, annotation = annotation, annotation_colors = annotation_colors, annotation_legend = annotation_legend, filename = NA, main = main, fontsize = fontsize, fontsize_row = fontsize_row, fontsize_col = fontsize_col, ...)
-		dev.off()
-	}
 }
 
 generate_breaks = function(x, n){
@@ -463,9 +467,9 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' @param cluster_rows boolean values determining if rows should be clustered,
 #' @param cluster_cols boolean values determining if columns should be clustered.
 #' @param clustering_distance_rows distance measure used in clustering rows. Possible 
-#' values are \code{"correlation"} and all the distances supported by \code{\link{dist}}, 
-#' such as \code{"euclidean"}, etc. If the value is none of the above it is assumed that 
-#' a distance matrix is provided.
+#' values are \code{"correlation"} for Pearson correlation and all the distances 
+#' supported by \code{\link{dist}}, such as \code{"euclidean"}, etc. If the value is none 
+#' of the above it is assumed that a distance matrix is provided.
 #' @param clustering_distance_cols distance measure used in clustering columns. Possible 
 #' values the same as for clustering_distance_rows.
 #' @param clustering_method clustering method used. Accepts the same values as 
@@ -490,10 +494,10 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' @param fontsize base fontsize for the plot 
 #' @param fontsize_row fontsize for rownames (Default: fontsize) 
 #' @param fontsize_col fontsize for colnames (Default: fontsize) 
-#' @param filename file path ending where to save the picture. Currently following 
-#' formats are supported: png, pdf, tiff, bmp, jpeg. Even if the plot does not fit into 
-#' the plotting window, the file size is calculated so that the plot would fit there, 
-#' unless specified otherwise.
+#' @param filename file path where to save the picture. Filetype is decided by 
+#' the extension in the path. Currently following formats are supported: png, pdf, tiff,
+#'  bmp, jpeg. Even if the plot does not fit into the plotting window, the file size is 
+#' calculated so that the plot would fit there, unless specified otherwise.
 #' @param width manual option for determining the output file width in
 #' @param height manual option for determining the output file height in inches.
 #' @param \dots graphical parameters for the text used in plot. Parameters passed to 

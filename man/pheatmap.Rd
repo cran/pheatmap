@@ -1,10 +1,10 @@
 \name{pheatmap}
 \alias{pheatmap}
 \title{A function to draw clustered heatmaps.}
-\usage{pheatmap(mat, color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF",
-    "#E0F3F8", "#91BFDB", "#4575B4")))(100), kmeans_k=NA, breaks=NA,
-    border_color="grey60", cellwidth=NA, cellheight=NA, scale="none",
-    cluster_rows=TRUE, cluster_cols=TRUE,
+\usage{pheatmap(mat, color=colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090",
+    "#FFFFBF", "#E0F3F8", "#91BFDB", "#4575B4")))(100), kmeans_k=NA,
+    breaks=NA, border_color="grey60", cellwidth=NA, cellheight=NA,
+    scale="none", cluster_rows=TRUE, cluster_cols=TRUE,
     clustering_distance_rows="euclidean",
     clustering_distance_cols="euclidean", clustering_method="complete",
     treeheight_row=ifelse(cluster_rows, 50, 0),
@@ -40,9 +40,9 @@ either the row direction or the column direction, or none. Corresponding values 
 \item{cluster_rows}{boolean values determining if rows should be clustered,}
 \item{cluster_cols}{boolean values determining if columns should be clustered.}
 \item{clustering_distance_rows}{distance measure used in clustering rows. Possible 
-values are \code{"correlation"} and all the distances supported by \code{\link{dist}}, 
-such as \code{"euclidean"}, etc. If the value is none of the above it is assumed that 
-a distance matrix is provided.}
+values are \code{"correlation"} for Pearson correlation and all the distances 
+supported by \code{\link{dist}}, such as \code{"euclidean"}, etc. If the value is none 
+of the above it is assumed that a distance matrix is provided.}
 \item{clustering_distance_cols}{distance measure used in clustering columns. Possible 
 values the same as for clustering_distance_rows.}
 \item{clustering_method}{clustering method used. Accepts the same values as 
@@ -67,10 +67,10 @@ should be drawn.}
 \item{fontsize}{base fontsize for the plot}
 \item{fontsize_row}{fontsize for rownames (Default: fontsize)}
 \item{fontsize_col}{fontsize for colnames (Default: fontsize)}
-\item{filename}{file path ending where to save the picture. Currently following 
-formats are supported: png, pdf, tiff, bmp, jpeg. Even if the plot does not fit into 
-the plotting window, the file size is calculated so that the plot would fit there, 
-unless specified otherwise.}
+\item{filename}{file path where to save the picture. Filetype is decided by 
+the extension in the path. Currently following formats are supported: png, pdf, tiff,
+bmp, jpeg. Even if the plot does not fit into the plotting window, the file size is 
+calculated so that the plot would fit there, unless specified otherwise.}
 \item{width}{manual option for determining the output file width in}
 \item{height}{manual option for determining the output file height in inches.}
 \item{\dots}{graphical parameters for the text used in plot. Parameters passed to 
