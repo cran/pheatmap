@@ -1,3 +1,2 @@
-import(grid)
-import(colorspace)
 export(pheatmap)
+import(grid)
