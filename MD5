@@ -1,6 +1,8 @@
-b6ad5d46f68284b87ff779a7d688d922 *DESCRIPTION
+30a70d57312e5e893d9fd93e9f1e48b6 *DESCRIPTION
 5fcc30de0b5f22a2a5479628d18282f1 *NAMESPACE
-6d11e25fb614297acf91255c6926d80b *R/pheatmap.r
-3f5c2ab7740ca342673d014af31c0986 *man/pheatmap-package.Rd
-28e2805a30d9a6b8ad4b1fca3447ee0a *man/pheatmap.Rd
-20732caa633539784532ef7089dd6fb9 *run_roxygen.r
+6abbf527649fdcbec3344160fa09f68e *NEWS
+a24ac0df36bf00ae276e1e29127b7228 *R/pheatmap-package.r
+61001740710797207beb356cad02c239 *R/pheatmap.r
+600bbaed4332d917462554cea1017f9e *README.md
+45aa67ae7dd3f6ce581eb4156c4a3a3a *man/pheatmap-package.Rd
+3c9fbf64257bd03afff1a5c8ae44e2d3 *man/pheatmap.Rd

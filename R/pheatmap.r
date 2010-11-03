@@ -128,13 +128,16 @@ draw_dendrogram = function(hc, horizontal = T){
 	}
 }
 
-draw_matrix = function(matrix, border_color){
+draw_matrix = function(matrix, border_color, fmat, fontsize_number){
 	n = nrow(matrix)
 	m = ncol(matrix)
 	x = (1:m)/m - 1/2/m
 	y = (1:n)/n - 1/2/n
 	for(i in 1:m){
 		grid.rect(x = x[i], y = y[1:n], width = 1/m, height = 1/n, gp = gpar(fill = matrix[,i], col = border_color))
+		if(attr(fmat, "draw")){
+			grid.text(x = x[i], y = y[1:n], label = fmat[, i], gp = gpar(col = "grey30", fontsize = fontsize_number))
+		}
 	}
 }
 
@@ -168,7 +171,7 @@ convert_annotations = function(annotation, annotation_colors){
 		b = annotation_colors[[colnames(annotation)[i]]]
 		if(is.character(a) | is.factor(a)){
 			a = as.character(a)
-			if(length(setdiff(names(b), a)) > 0){
+			if(length(setdiff(a, names(b))) > 0){
 				stop(sprintf("Factor levels on variable %s do not match with annotation_colors", colnames(annotation)[i]))
 			}
 			new[, i] = b[a]
@@ -225,7 +228,7 @@ vplayout = function(x, y){
 	return(viewport(layout.pos.row = x, layout.pos.col = y))
 }
 
-heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, tree_row, treeheight_col, treeheight_row, filename, width, height, breaks, color, legend, annotation, annotation_colors, annotation_legend, main, fontsize, fontsize_row, fontsize_col, ...){
+heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, tree_row, treeheight_col, treeheight_row, filename, width, height, breaks, color, legend, annotation, annotation_colors, annotation_legend, main, fontsize, fontsize_row, fontsize_col, fmat, fontsize_number, ...){
 	grid.newpage()
 	
 	# Set layout
@@ -258,7 +261,7 @@ heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, 
 		
 		# print(sprintf("height:%f width:%f", height, width))
 		f(filename, height = height, width = width)
-		heatmap_motor(matrix, cellwidth = cellwidth, cellheight = cellheight, border_color = border_color, tree_col = tree_col, tree_row = tree_row, treeheight_col = treeheight_col, treeheight_row = treeheight_row, breaks = breaks, color = color, legend = legend, annotation = annotation, annotation_colors = annotation_colors, annotation_legend = annotation_legend, filename = NA, main = main, fontsize = fontsize, fontsize_row = fontsize_row, fontsize_col = fontsize_col, ...)
+		heatmap_motor(matrix, cellwidth = cellwidth, cellheight = cellheight, border_color = border_color, tree_col = tree_col, tree_row = tree_row, treeheight_col = treeheight_col, treeheight_row = treeheight_row, breaks = breaks, color = color, legend = legend, annotation = annotation, annotation_colors = annotation_colors, annotation_legend = annotation_legend, filename = NA, main = main, fontsize = fontsize, fontsize_row = fontsize_row, fontsize_col = fontsize_col, fmat = fmat, fontsize_number =  fontsize_number, ...)
 		dev.off()
 		upViewport()
 		return()
@@ -290,7 +293,7 @@ heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, 
 	
 	# Draw matrix
 	pushViewport(vplayout(4, 2))
-	draw_matrix(matrix, border_color)
+	draw_matrix(matrix, border_color, fmat, fontsize_number)
 	upViewport()
 	
 	# Draw colnames
@@ -319,14 +322,25 @@ heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, 
 	
 	# Draw annotation legend
 	if(!is.na(annotation[[1]][1]) & annotation_legend){
-		pushViewport(vplayout(3:5, 5))
+		if(length(rownames(matrix)) != 0){
+			pushViewport(vplayout(4:5, 5))
+		}
+		else{
+			pushViewport(vplayout(3:5, 5))
+		}
 		draw_annotation_legend(annotation, annotation_colors, border_color, fontsize = fontsize, ...)
 		upViewport()
 	}
 	
 	# Draw legend
 	if(!is.na(legend[1])){
-		pushViewport(vplayout(3:5, 4))
+		length(colnames(matrix))
+		if(length(rownames(matrix)) != 0){
+			pushViewport(vplayout(4:5, 4))
+		}
+		else{
+			pushViewport(vplayout(3:5, 4))
+		}
 		draw_legend(color, breaks, legend, fontsize = fontsize, ...)
 		upViewport()
 	}
@@ -384,13 +398,16 @@ scale_mat = function(mat, scale){
 	return(mat)
 }
 
-generate_annotation_colours = function(annotation, annotation_colors){
+generate_annotation_colours = function(annotation, annotation_colors, drop){
 	if(is.na(annotation_colors)[[1]][1]){
 		annotation_colors = list()
 	}
 	count = 0
 	for(i in 1:ncol(annotation)){
 		if(is.character(annotation[, i]) | is.factor(annotation[, i])){
+			if (is.factor(annotation[, i]) & !drop){
+				count = count + length(levels(annotation[, i]))
+			}
 			count = count + length(unique(annotation[, i]))
 		}
 	}
@@ -403,17 +420,23 @@ generate_annotation_colours = function(annotation, annotation_colors){
 	for(i in 1:ncol(annotation)){
 		if(!(colnames(annotation)[i] %in% names(annotation_colors))){
 			if(is.character(annotation[, i]) | is.factor(annotation[, i])){
-				ind = sample(1:length(factor_colors), length(unique(annotation[, i])))
+				n = length(unique(annotation[, i]))
+				if (is.factor(annotation[, i]) & !drop){
+					n = length(levels(annotation[, i]))
+				}
+				ind = sample(1:length(factor_colors), n)
 				annotation_colors[[colnames(annotation)[i]]] = factor_colors[ind]
 				l = levels(as.factor(annotation[, i]))
 				l = l[l %in% unique(annotation[, i])]
+				if (is.factor(annotation[, i]) & !drop){
+					l = levels(annotation[, i])
+				}
 				names(annotation_colors[[colnames(annotation)[i]]]) = l
 				factor_colors = factor_colors[-ind]
 			}
 			else{
 				r = runif(1)
-				annotation_colors[[colnames(annotation)[i]]] = hsv(r, 
-          c(0.1, 1), 1)
+				annotation_colors[[colnames(annotation)[i]]] = hsv(r, c(0.1, 1), 1)
 			}
 		}
 	}
@@ -428,6 +451,7 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 	}
 	
 	# Cluster data
+	set.seed(1245678)
 	km = kmeans(mat, k, iter.max = 100)
 	mat2 = km$centers
 	
@@ -440,6 +464,9 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 }
  
 #' A function to draw clustered heatmaps.
+#' 
+#' A function to draw clustered heatmaps where one has better control over some graphical 
+#' parameters such as cell size, etc. 
 #' 
 #' The function also allows to aggregate the rows using kmeans clustering. This is 
 #' advisable if number of rows is so big that R cannot handle their hierarchical 
@@ -488,12 +515,19 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' details.
 #' @param annotation_legend boolean value showing if the legend for annotation tracks 
 #' should be drawn. 
+#' @param drop_levels logical to determine if unused levels are also shown in the legend
 #' @param show_rownames boolean specifying if column names are be shown.
 #' @param show_colnames boolean specifying if column names are be shown.
 #' @param main the title of the plot
 #' @param fontsize base fontsize for the plot 
 #' @param fontsize_row fontsize for rownames (Default: fontsize) 
 #' @param fontsize_col fontsize for colnames (Default: fontsize) 
+#' @param display_numbers logical determining if the numeric values are also printed to 
+#' the cells. 
+#' @param number_format format strings (C printf style) of the numbers shown in cells. 
+#' For example "\code{\%.2f}" shows 2 decimal places and "\code{\%.1e}" shows exponential 
+#' notation (see more in \code{\link{sprintf}}).    
+#' @param fontsize_number fontsize of the numbers displayed in cells
 #' @param filename file path where to save the picture. Filetype is decided by 
 #' the extension in the path. Currently following formats are supported: png, pdf, tiff,
 #'  bmp, jpeg. Even if the plot does not fit into the plotting window, the file size is 
@@ -502,6 +536,16 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' @param height manual option for determining the output file height in inches.
 #' @param \dots graphical parameters for the text used in plot. Parameters passed to 
 #' \code{\link{grid.text}}, see \code{\link{gpar}}. 
+#' 
+#' @return 
+#' Invisibly a list of components 
+#' \itemize{
+#' 	\item \code{tree_row} the clustering of rows as \code{\link{hclust}} object 
+#' 	\item \code{tree_col} the clustering of columns as \code{\link{hclust}} object
+#' 	\item \code{kmeans} the kmeans clustering of rows if parameter \code{kmeans_k} was 
+#' specified 
+#' }
+#' 
 #' @author  Raivo Kolde <rkolde@@gmail.com>
 #' @examples
 #'  # Generate some data
@@ -513,22 +557,25 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #'
 #'	# Draw heatmaps
 #'	pheatmap(test)
-#'  pheatmap(test, kmeans_k = 2)
+#'	pheatmap(test, kmeans_k = 2)
 #'	pheatmap(test, scale = "row", clustering_distance_rows = "correlation")
 #'	pheatmap(test, color = colorRampPalette(c("navy", "white", "firebrick3"))(50))
 #'	pheatmap(test, cluster_row = FALSE)
 #'	pheatmap(test, legend = FALSE)
+#'	pheatmap(test, display_numbers = TRUE)
+#'	pheatmap(test, display_numbers = TRUE, number_format = "%.1e")
 #'	pheatmap(test, cellwidth = 15, cellheight = 12, main = "Example heatmap")
 #'	pheatmap(test, cellwidth = 15, cellheight = 12, fontsize = 8, filename = "test.pdf")
 #'
 #'
 #'	# Generate column annotations
 #'	annotation = data.frame(Var1 = factor(1:10 \%\% 2 == 0, labels = c("Class1", "Class2")), Var2 = 1:10)
+#'	annotation$Var1 = factor(annotation$Var1, levels = c("Class1", "Class2", "Class3"))
 #'	rownames(annotation) = paste("Test", 1:10, sep = "")
 #'
 #'	pheatmap(test, annotation = annotation)
 #'	pheatmap(test, annotation = annotation, annotation_legend = FALSE)
-#'
+#'	pheatmap(test, annotation = annotation, annotation_legend = FALSE, drop_levels = FALSE)
 #'
 #'	# Specify colors
 #'	Var1 = c("navy", "darkgreen")
@@ -543,9 +590,9 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #'	drows = dist(test, method = "minkowski")
 #'	dcols = dist(t(test), method = "minkowski")
 #'	pheatmap(test, clustering_distance_rows = drows, clustering_distance_cols = dcols)
-#' 
+#'	
 #' @export
-pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF", "#E0F3F8", "#91BFDB", "#4575B4")))(100), kmeans_k = NA, breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", clustering_method = "complete",  treeheight_row = ifelse(cluster_rows, 50, 0), treeheight_col = ifelse(cluster_cols, 50, 0), legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, show_rownames = T, show_colnames = T, main = NA, fontsize = 10, fontsize_row = fontsize, fontsize_col = fontsize, filename = NA, width = NA, height = NA, ...){
+pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF", "#E0F3F8", "#91BFDB", "#4575B4")))(100), kmeans_k = NA, breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", clustering_method = "complete",  treeheight_row = ifelse(cluster_rows, 50, 0), treeheight_col = ifelse(cluster_cols, 50, 0), legend = TRUE, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, drop_levels = TRUE, show_rownames = T, show_colnames = T, main = NA, fontsize = 10, fontsize_row = fontsize, fontsize_col = fontsize, display_numbers = F, number_format = "%.2f", fontsize_number = 0.8 * fontsize, filename = NA, width = NA, height = NA, ...){
 	
 	# Preprocess matrix
 	mat = as.matrix(mat)
@@ -561,6 +608,9 @@ pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#
 		t = table(km$cluster)
 		rownames(mat) = sprintf("cl%s_size_%d", names(t), t)
 	}
+	else{
+		km = NA
+	}
 	
 	# Do clustering
 	if(cluster_rows){
@@ -570,6 +620,7 @@ pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#
 	else{
 		tree_row = NA
 		treeheight_row = 0
+		mat = mat[nrow(mat):1, ]
 	}
 	
 	if(cluster_cols){
@@ -580,6 +631,17 @@ pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#
 		tree_col = NA
 		treeheight_col = 0
 	}
+	
+	# Format numbers to be displayed in cells 
+	if(display_numbers){
+		fmat = matrix(sprintf(number_format, mat), nrow = nrow(mat), ncol = ncol(mat))
+		attr(fmat, "draw") = TRUE
+	}
+	else{
+		fmat = matrix(NA, nrow = nrow(mat), ncol = ncol(mat))
+		attr(fmat, "draw") = FALSE
+	}
+	
 	
 	# Colors and scales
 	if(is.na(breaks[1])){
@@ -596,7 +658,7 @@ pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#
 	# Preparing annotation colors
 	if(!is.na(annotation[[1]][1])){
 		annotation = annotation[colnames(mat), , drop = F]
-		annotation_colors = generate_annotation_colours(annotation, annotation_colors)
+		annotation_colors = generate_annotation_colours(annotation, annotation_colors, drop = drop_levels)
 	}
 	
 	if(!show_rownames){
@@ -608,20 +670,9 @@ pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#
 	}
 	
 	# Draw heatmap
-	heatmap_motor(mat, border_color = border_color, cellwidth = cellwidth, cellheight = cellheight, treeheight_col = treeheight_col, treeheight_row = treeheight_row, tree_col = tree_col, tree_row = tree_row, filename = filename, width = width, height = height, breaks = breaks, color = color, legend = legend, annotation = annotation, annotation_colors = annotation_colors, annotation_legend = annotation_legend, main = main, fontsize = fontsize, fontsize_row = fontsize_row, fontsize_col = fontsize_col, ...)
+	heatmap_motor(mat, border_color = border_color, cellwidth = cellwidth, cellheight = cellheight, treeheight_col = treeheight_col, treeheight_row = treeheight_row, tree_col = tree_col, tree_row = tree_row, filename = filename, width = width, height = height, breaks = breaks, color = color, legend = legend, annotation = annotation, annotation_colors = annotation_colors, annotation_legend = annotation_legend, main = main, fontsize = fontsize, fontsize_row = fontsize_row, fontsize_col = fontsize_col, fmat = fmat, fontsize_number = fontsize_number, ...)
+	
+	invisible(list(tree_row = tree_row, tree_col = tree_col, kmeans = km))
 }
 
-#' Pretty heatmaps
-#' 
-#'  The package for drawing pretty heatmaps in R. The ordinary heatmap function in R has 
-#' several drawbacks, when it comes to producing publication quality heatmaps. It is hard 
-#' to produce pictures with consistent text, cell and overall sizes. The function 
-#' pheatmap tries to alleviate the problems by offering more fine grained control over 
-#' heatmap dimensions and appearance.
-#' 
-#' @name pheatmap-package
-#' @docType package
-#' 
-#' @import grid
-#' 
-NA
+
