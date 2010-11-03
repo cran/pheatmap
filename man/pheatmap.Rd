@@ -8,7 +8,8 @@
     clustering_method="complete", treeheight_row=ifelse(cluster_rows, 50, 0),
     treeheight_col=ifelse(cluster_cols, 50, 0), legend=TRUE, annotation=NA,
     annotation_colors=NA, annotation_legend=TRUE, show_rownames=T, show_colnames=T,
-    filename=NA, width=NA, height=NA, ...)
+    fontsize=10, fontsize_row=fontsize, fontsize_col=fontsize, filename=NA, width=NA,
+    height=NA, ...)
 }
 \description{A function to draw clustered heatmaps.}
 \details{Detailed description of function}
@@ -54,6 +55,9 @@ details.}
 should be drawn.}
 \item{show_rownames}{boolean specifying if column names are be shown.}
 \item{show_colnames}{boolean specifying if column names are be shown.}
+\item{fontsize}{base fontsize for the plot}
+\item{fontsize_row}{fontsize for rownames (Default: fontsize)}
+\item{fontsize_col}{fontsize for colnames (Default: fontsize)}
 \item{filename}{file path ending where to save the picture. Currently following 
 formats are supported: png, pdf, tiff, bmp, jpeg. Even if the plot does not fit into 
 the plotting window, the file size is calculated so that the plot would fit there, 
@@ -61,8 +65,7 @@ unless specified otherwise.}
 \item{width}{manual option for determining the output file width in}
 \item{height}{manual option for determining the output file height in inches.}
 \item{\dots}{graphical parameters for the text used in plot. Parameters passed to 
-\code{\link{grid.text}}, see \code{\link{gpar}}. For text size use parameter fontsize 
-(default = 10).}
+\code{\link{grid.text}}, see \code{\link{gpar}}.}
 }
 \examples{# Generate some data
 test = matrix(rnorm(200), 20, 10)
