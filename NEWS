@@ -1,3 +1,18 @@
+Version 0.7.7
+-------------------------------------------------------------------------------
+Fixed a bug related to calculating space for the column and row names. Made the
+documentation more readable
+
+Added .Rbuildignore
+
+Version 0.7.6
+-------------------------------------------------------------------------------
+Fixed a bug, where the color scales for scaled matrices were not centered to 0.
+
+Version 0.7.5
+-------------------------------------------------------------------------------
+Minor bug fix
+
 Version 0.7.4
 -------------------------------------------------------------------------------
 Minor bug fixes

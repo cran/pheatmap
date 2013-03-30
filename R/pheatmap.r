@@ -1,18 +1,18 @@
 lo = function(rown, coln, nrow, ncol, cellheight = NA, cellwidth = NA, treeheight_col, treeheight_row, legend, annotation, annotation_colors, annotation_legend, main, fontsize, fontsize_row, fontsize_col, ...){
 	# Get height of colnames and length of rownames
 	if(!is.null(coln[1])){
-		longest_coln = which.max(nchar(coln))
+		longest_coln = which.max(strwidth(coln, units = 'in'))
 		gp = list(fontsize = fontsize_col, ...)
-		coln_height = unit(1.1, "grobheight", textGrob(coln[longest_coln], rot = 90, gp = do.call(gpar, gp)))
+		coln_height = unit(1, "grobheight", textGrob(coln[longest_coln], rot = 90, gp = do.call(gpar, gp))) + unit(5, "bigpts")
 	}
 	else{
 		coln_height = unit(5, "bigpts")
 	}
 	
 	if(!is.null(rown[1])){
-		longest_rown = which.max(nchar(rown))
+		longest_rown = which.max(strwidth(rown, units = 'in'))
 		gp = list(fontsize = fontsize_row, ...)
-		rown_width = unit(1.2, "grobwidth", textGrob(rown[longest_rown], gp = do.call(gpar, gp)))
+		rown_width = unit(1, "grobwidth", textGrob(rown[longest_rown], gp = do.call(gpar, gp))) + unit(10, "bigpts")
 	}
 	else{
 		rown_width = unit(5, "bigpts")
@@ -349,8 +349,16 @@ heatmap_motor = function(matrix, border_color, cellwidth, cellheight, tree_col, 
 	
 }
 
-generate_breaks = function(x, n){
-	seq(min(x, na.rm = T), max(x, na.rm = T), length.out = n + 1)
+generate_breaks = function(x, n, center = F){
+	if(center){
+		m = max(abs(c(min(x, na.rm = T), max(x, na.rm = T))))
+		res = seq(-m, m, length.out = n + 1)
+	}
+	else{
+		res = seq(min(x, na.rm = T), max(x, na.rm = T), length.out = n + 1)
+	}
+	
+	return(res)
 }
 
 scale_vec_colours = function(x, col = rainbow(10), breaks = NA){
@@ -537,7 +545,7 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' the extension in the path. Currently following formats are supported: png, pdf, tiff,
 #'  bmp, jpeg. Even if the plot does not fit into the plotting window, the file size is 
 #' calculated so that the plot would fit there, unless specified otherwise.
-#' @param width manual option for determining the output file width in
+#' @param width manual option for determining the output file width in inches.
 #' @param height manual option for determining the output file height in inches.
 #' @param \dots graphical parameters for the text used in plot. Parameters passed to 
 #' \code{\link{grid.text}}, see \code{\link{gpar}}. 
@@ -577,7 +585,8 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' 
 #' 
 #' # Generate column annotations
-#' annotation = data.frame(Var1 = factor(1:10 \%\% 2 == 0, labels = c("Class1", "Class2")), Var2 = 1:10)
+#' annotation = data.frame(Var1 = factor(1:10 %% 2 == 0, 
+#' 				labels = c("Class1", "Class2")), Var2 = 1:10)
 #' annotation$Var1 = factor(annotation$Var1, levels = c("Class1", "Class2", "Class3"))
 #' rownames(annotation) = paste("Test", 1:10, sep = "")
 #' 
@@ -592,7 +601,7 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' 
 #' ann_colors = list(Var1 = Var1, Var2 = Var2)
 #' 
-#' pheatmap(test, annotation = annotation, annotation_colors = ann_colors, main = "Example with all the features")
+#' pheatmap(test, annotation = annotation, annotation_colors = ann_colors, main = "Example")
 #' 
 #' # Specifying clustering from distance matrix
 #' drows = dist(test, method = "minkowski")
@@ -600,11 +609,17 @@ kmeans_pheatmap = function(mat, k = min(nrow(mat), 150), sd_limit = NA, ...){
 #' pheatmap(test, clustering_distance_rows = drows, clustering_distance_cols = dcols)
 #'
 #' @export
-pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#FEE090", "#FFFFBF", "#E0F3F8", "#91BFDB", "#4575B4")))(100), kmeans_k = NA, breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", clustering_method = "complete",  treeheight_row = ifelse(cluster_rows, 50, 0), treeheight_col = ifelse(cluster_cols, 50, 0), legend = TRUE, legend_breaks = NA, legend_labels = NA, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, drop_levels = TRUE, show_rownames = T, show_colnames = T, main = NA, fontsize = 10, fontsize_row = fontsize, fontsize_col = fontsize, display_numbers = F, number_format = "%.2f", fontsize_number = 0.8 * fontsize, filename = NA, width = NA, height = NA, ...){
+pheatmap = function(mat, color = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(100), kmeans_k = NA, breaks = NA, border_color = "grey60", cellwidth = NA, cellheight = NA, scale = "none", cluster_rows = TRUE, cluster_cols = TRUE, clustering_distance_rows = "euclidean", clustering_distance_cols = "euclidean", clustering_method = "complete",  treeheight_row = ifelse(cluster_rows, 50, 0), treeheight_col = ifelse(cluster_cols, 50, 0), legend = TRUE, legend_breaks = NA, legend_labels = NA, annotation = NA, annotation_colors = NA, annotation_legend = TRUE, drop_levels = TRUE, show_rownames = T, show_colnames = T, main = NA, fontsize = 10, fontsize_row = fontsize, fontsize_col = fontsize, display_numbers = F, number_format = "%.2f", fontsize_number = 0.8 * fontsize, filename = NA, width = NA, height = NA, ...){
 	
 	# Preprocess matrix
 	mat = as.matrix(mat)
-	mat = scale_mat(mat, scale)
+	if(scale != "none"){
+		mat = scale_mat(mat, scale)
+		if(is.na(breaks)){
+			breaks = generate_breaks(mat, length(color), center = T)
+		}
+	}
+	
 	
 	# Kmeans
 	if(!is.na(kmeans_k)){
@@ -623,7 +638,7 @@ pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#
 	# Do clustering
 	if(cluster_rows){
 		tree_row = cluster_mat(mat, distance = clustering_distance_rows, method = clustering_method)
-		mat = mat[tree_row$order, ]
+		mat = mat[tree_row$order, , drop = FALSE]
 	}
 	else{
 		tree_row = NA
@@ -632,7 +647,7 @@ pheatmap = function(mat, color = colorRampPalette(rev(c("#D73027", "#FC8D59", "#
 	
 	if(cluster_cols){
 		tree_col = cluster_mat(t(mat), distance = clustering_distance_cols, method = clustering_method)
-		mat = mat[, tree_col$order]
+		mat = mat[, tree_col$order, drop = FALSE]
 	}
 	else{
 		tree_col = NA
