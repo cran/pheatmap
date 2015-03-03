@@ -1,3 +1,41 @@
+Version 1.0.2
+-------------------------------------------------------------------------------
+Trying to comply with CRAN policies
+
+Version 1.0.1
+-------------------------------------------------------------------------------
+Fixed small bug with gap calculation
+
+Version 1.0.0
+-------------------------------------------------------------------------------
+Major rewrite of pheatmap.
+
+* Internally pheatmap uses now gtable package and returns the gtable object that
+ gives more flexibility in editing the figure or combining it with other plots
+* Introduced the opportunity to separate parts of heatmap using gaps. This can 
+be achieved using gaps_col and gaps_row parameter when the corresponding 
+dimension is not clustered. Alternatively cutree_row and cutree_col introduce 
+the gaps based on the clustering.
+* Now it is possible to annotate rows of heatmaps in similar manner as it was 
+possible with columns before.
+* Now it is possible to supply custom labels for rows and columns. 
+* Added names to annotation tracks
+* Improved the overall appearance of the plot, concentrating on legends and 
+annotation color schemes
+
+Version 0.7.10
+-------------------------------------------------------------------------------
+Can set color to the values shown inside the cells. 
+
+Version 0.7.9
+-------------------------------------------------------------------------------
+Added option to show arbitrary values within cells, by giving a matrix to 
+display_numbers parameter.
+
+Version 0.7.8
+-------------------------------------------------------------------------------
+Made the dendrogram drawing faster
+
 Version 0.7.7
 -------------------------------------------------------------------------------
 Fixed a bug related to calculating space for the column and row names. Made the
