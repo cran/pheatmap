@@ -1,3 +1,24 @@
+Version 1.0.7
+-------------------------------------------------------------------------------
+Trying to comply with CRAN policies
+
+Version 1.0.6
+-------------------------------------------------------------------------------
+Added clustering_callback option to give more control over the hierarchical 
+clustering
+
+Version 1.0.5
+-------------------------------------------------------------------------------
+Fixed the continuous legend bug
+
+Version 1.0.4
+-------------------------------------------------------------------------------
+Make the NA handling in parameters more intelligent
+
+Version 1.0.3
+-------------------------------------------------------------------------------
+Make the NA handling more intelligent for annotations
+
 Version 1.0.2
 -------------------------------------------------------------------------------
 Trying to comply with CRAN policies
