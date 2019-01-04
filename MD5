@@ -1,7 +1,7 @@
-7e56d000add0cc511087fc6cad0fc4cc *DESCRIPTION
+51bd14f010ae3849595da467b2fa1b59 *DESCRIPTION
 78782d5445c49e9726ca72c2e402ed5d *NAMESPACE
-f7faaf0811b2edf2855a91756efb2a02 *NEWS
+3a6d5a36862e5919f612fd0f8228b6ab *NEWS
 178d5b128522e14059bcf34c3896f15b *R/pheatmap-package.r
-4315f531d2f65f8a5217ff64e79bbb17 *R/pheatmap.r
+e70a3b37d35b603ce8347299c5d8a5ec *R/pheatmap.r
 2e201559629a65453ee5352f26ee784f *man/pheatmap-package.Rd
-11a013adc4e0e87abf5e81aad46a6979 *man/pheatmap.Rd
+d97927d3eb078a1eda9b5cc2dfdf835e *man/pheatmap.Rd

@@ -18,23 +18,26 @@ pheatmap(mat, color = colorRampPalette(rev(brewer.pal(n = 7, name =
   annotation_names_row = TRUE, annotation_names_col = TRUE,
   drop_levels = TRUE, show_rownames = T, show_colnames = T, main = NA,
   fontsize = 10, fontsize_row = fontsize, fontsize_col = fontsize,
-  display_numbers = F, number_format = "\%.2f", number_color = "grey30",
-  fontsize_number = 0.8 * fontsize, gaps_row = NULL, gaps_col = NULL,
-  labels_row = NULL, labels_col = NULL, filename = NA, width = NA,
-  height = NA, silent = FALSE, na_col = "#DDDDDD", ...)
+  angle_col = c("270", "0", "45", "90", "315"), display_numbers = F,
+  number_format = "\%.2f", number_color = "grey30", fontsize_number = 0.8
+  * fontsize, gaps_row = NULL, gaps_col = NULL, labels_row = NULL,
+  labels_col = NULL, filename = NA, width = NA, height = NA,
+  silent = FALSE, na_col = "#DDDDDD", ...)
 }
 \arguments{
 \item{mat}{numeric matrix of the values to be plotted.}
 
 \item{color}{vector of colors used in heatmap.}
 
-\item{kmeans_k}{the number of kmeans clusters to make, if we want to agggregate the 
+\item{kmeans_k}{the number of kmeans clusters to make, if we want to aggregate the 
 rows before drawing heatmap. If NA then the rows are not aggregated.}
 
 \item{breaks}{a sequence of numbers that covers the range of values in mat and is one 
 element longer than color vector. Used for mapping values to colors. Useful, if needed 
 to map certain values to certain colors, to certain values. If value is NA then the 
-breaks are calculated automatically.}
+breaks are calculated automatically. When breaks do not cover the range of values, 
+then any value larger than \code{max(breaks)} will have the largest color and any value 
+lower than\code{ min(breaks)} will get the lowest color.}
 
 \item{border_color}{color of cell borders on heatmap, use NA if no border should be 
 drawn.}
@@ -124,6 +127,9 @@ the legend}
 
 \item{fontsize_col}{fontsize for colnames (Default: fontsize)}
 
+\item{angle_col}{angle of the column labels, right now one can choose only from few 
+predefined options (0, 45, 90, 270 and 315)}
+
 \item{display_numbers}{logical determining if the numeric values are also printed to 
 the cells. If this is a matrix (with same dimensions as original matrix), the contents
 of the matrix are shown instead of original values.}
@@ -136,7 +142,7 @@ notation (see more in \code{\link{sprintf}}).}
 
 \item{fontsize_number}{fontsize of the numbers displayed in cells}
 
-\item{gaps_row}{vector of row indices that show shere to put gaps into
+\item{gaps_row}{vector of row indices that show where to put gaps into
 heatmap. Used only if the rows are not clustered. See \code{cutree_row}
 to see how to introduce gaps to clustered rows.}
 
@@ -229,6 +235,9 @@ pheatmap(test, annotation_col = annotation_col)
 pheatmap(test, annotation_col = annotation_col, annotation_legend = FALSE)
 pheatmap(test, annotation_col = annotation_col, annotation_row = annotation_row)
 
+# Change angle of text in the columns
+pheatmap(test, annotation_col = annotation_col, annotation_row = annotation_row, angle_col = "45")
+pheatmap(test, annotation_col = annotation_col, angle_col = "0")
 
 # Specify colors
 ann_colors = list(
